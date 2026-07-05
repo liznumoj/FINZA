@@ -13,7 +13,7 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{margin:0;padding:0;overflow:hidden;height:100%;color-scheme:dark;}
+html,body{margin:0;padding:0;height:100%;color-scheme:dark;background:#14112B;}
 :root{
   --abyss:#14112B;--surface:#201B45;--surface2:#2C2660;--line:#3A3470;
   --ink:#F2EEFF;--muted:#9B93C7;
@@ -27,7 +27,7 @@ body,button,input,select,textarea{font-family:'Inter',system-ui,sans-serif;}
   --ink:#F2EEFF;--muted:#9B93C7;
   --gastos:#FF6B5E;--ingresos:#3DD68C;--ahorros:#FFC857;--inversiones:#A78BFA;
   --flame:#FF8A3D;--xp:#7DE2FF;
-  position:fixed;top:0;left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;color:var(--ink);
+  min-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;color:var(--ink);
   background:radial-gradient(120% 80% at 50% -10%,#2A2160 0%,var(--abyss) 55%);
   display:flex;justify-content:center;
 }
@@ -151,10 +151,9 @@ body,button,input,select,textarea{font-family:'Inter',system-ui,sans-serif;}
 <div id="overlays"></div>
 
 <script>
-/* ====== PUENTE: esta interfaz vive fuera de Google; habla con el motor por API ====== */
 var API_URL='https://script.google.com/macros/s/AKfycbwIQ0WvkLUNkezYLF1Sdp4injx9ljEXbwcO9MgQjpu0KwZ6CRiRDSitzu8lFsKS93Q/exec';
 (function(){
-  if (window.google && google.script && google.script.run) return; // dentro de Apps Script: puente innecesario
+  if (window.google && google.script && google.script.run) return;
   var FNS=['getData','addMovimiento','updateMovimiento','deleteMovimiento','readReceipt','parseQuick','comprarAccesorio','equiparAccesorio','reclamarReto'];
   function makeRun(){
     var okF=function(){},errF=function(e){console.error(e);};
@@ -167,7 +166,7 @@ var API_URL='https://script.google.com/macros/s/AKfycbwIQ0WvkLUNkezYLF1Sdp4injx9
         fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({api:fn,args:args})})
           .then(function(r){return r.json();})
           .then(function(res){ if(res&&res.error){errF({message:res.error});} else {okF(res?res.result:null);} })
-          .catch(function(e){errF({message:'Sin conexión con el motor ('+(e&&e.message||e)+')'});});
+          .catch(function(e){errF({message:'Sin conexión ('+(e&&e.message||e)+')'});});
       };
     });
     return o;
