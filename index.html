@@ -31,7 +31,7 @@ body,button,input,select,textarea{font-family:'Inter',system-ui,sans-serif;}
   background:radial-gradient(120% 80% at 50% -10%,#2A2160 0%,var(--abyss) 55%);
   display:flex;justify-content:center;
 }
-.shell{width:100%;max-width:460px;padding:18px 16px 110px;position:relative;}
+.shell{width:100%;max-width:460px;padding:calc(14px + env(safe-area-inset-top)) 16px 110px;position:relative;}
 .fz-display{font-family:'Fredoka',sans-serif;}
 .hero{background:linear-gradient(160deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:26px;padding:18px;position:relative;overflow:hidden;}
 .hero-top{display:flex;align-items:center;gap:14px;}
