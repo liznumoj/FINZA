@@ -214,7 +214,7 @@ function num(v){var n=parseFloat(String(v).replace(/[^0-9.]/g,''));return isNaN(
 /* ---------- boot ---------- */
 fitHeight();
 google.script.run.withSuccessHandler(boot).withFailureHandler(fatal).getData();
-function boot(d){S.mov=d.movimientos||[];S.metas=d.metas||[];S.cfg=d.config||{};S.deudas=d.deudas||[];S.presup=d.presup||{};S.tend=d.tendencia||[];render();}
+function boot(d){S.mov=d.movimientos||[];S.metas=d.metas||[];S.cfg=d.config||{};S.deudas=d.deudas||[];S.presup=d.presup||{};S.tend=d.tendencia||[];S.saldoInicial=Number(d.saldoInicial)||0;S.cuentas=d.cuentas||[];render();}
 function fatal(e){document.getElementById('shell').innerHTML='<div class="empty">No pude cargar tus datos.<br>'+esc(e.message)+'</div>';}
 
 /* ---------- render ---------- */
@@ -225,7 +225,7 @@ function render(){
   var monthMov=S.mov.filter(thisMonth);
   var tot={gasto:sum(monthMov,'gasto'),ingreso:sum(monthMov,'ingreso'),ahorro:sum(S.mov,'ahorro'),inversion:sum(S.mov,'inversion')};
   var gastoEfec=S.mov.filter(function(x){return x.tipo==='gasto'&&(!x.metodo||x.metodo==='efectivo');}).reduce(function(a,x){return a+Number(x.monto||0);},0);
-  var bal=sum(S.mov,'ingreso')-gastoEfec-sum(S.mov,'abono')-sum(S.mov,'ahorro')-sum(S.mov,'inversion');
+  var bal=(Number(S.saldoInicial)||0)+sum(S.mov,'ingreso')-gastoEfec-sum(S.mov,'abono')-sum(S.mov,'ahorro')-sum(S.mov,'inversion');
   var hueGanados=hueGanadosTotal();
   var huesitos=Math.max(0,hueGanados-(Number(S.cfg.huesitosGastados)||0));
 
@@ -254,6 +254,16 @@ function render(){
   }
 
   if(S.tab==='deudas'){
+  if(S.cuentas&&S.cuentas.length){
+    var totalCuentas=S.cuentas.reduce(function(a,x){return a+Number(x.saldo||0);},0);
+    html+='<div class="label">Mis cuentas · '+money(totalCuentas)+' inicial</div>';
+    S.cuentas.forEach(function(x){
+      html+='<div class="row"><div class="av" style="background:#3DD68C22">'+esc(x.emoji)+'</div>'+
+        '<div class="meta"><b>'+esc(x.nombre)+'</b><span>Saldo inicial registrado</span></div>'+
+        '<div class="val" style="color:#3DD68C">'+money(x.saldo)+'</div></div>';
+    });
+    html+='<div style="font-size:11.5px;color:var(--muted);margin:4px 4px 6px">Edita estos saldos en la hoja "Cuentas" de tu Google Sheet.</div>';
+  }
   if(S.deudas&&S.deudas.length){
     var totalDeuda=S.deudas.reduce(function(a,x){return a+x.saldo;},0);
     html+='<div class="label">Mis deudas · '+money(totalDeuda)+'</div>';
@@ -263,8 +273,8 @@ function render(){
         '<div class="meta"><b>'+esc(x.nombre)+'</b><span>'+(x.tipo==='prestamo'?'Préstamo':'Tarjeta')+' · toca para abonar</span></div>'+
         '<div class="val" style="color:'+(x.saldo>0?'#5EE6C5':'#3DD68C')+'">'+(x.saldo>0?money(x.saldo):'¡Saldada! 🎉')+'</div></div>';
     });
-  }else{
-    html+='<div class="empty">Registra tus tarjetas y préstamos en la hoja "Deudas" de tu Google Sheet y aparecerán aquí. 💳</div>';
+  }else if(!S.cuentas||!S.cuentas.length){
+    html+='<div class="empty">Registra tus cuentas (efectivo, banco) en la hoja "Cuentas" y tus tarjetas/préstamos en la hoja "Deudas" de tu Google Sheet. 💳</div>';
   }
   }
 
